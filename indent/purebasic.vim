@@ -269,12 +269,12 @@ def GetPureBasicIndent(vlnum: number): number
    # Easiest case is that this is the first line in the buffer and the
    # indent is 0.
 
-   echom $">>>GetIndent({vlnum})"
+# echom $">>>GetIndent({vlnum})"
    if vlnum < 2
       # FIXME: This doesn't work of I enter the first line with leading spaces,
       # but it does when I do a manual indent.
       # ??
-      echom "<<<First line"
+# echom "<<<First line"
       return 0
    endif
 
@@ -282,14 +282,14 @@ def GetPureBasicIndent(vlnum: number): number
 
    this_line = getline(vlnum)
    this_words = split(this_line)
-   echom $"this  ==> {vlnum}:{this_line}"
+# echom $"this  ==> {vlnum}:{this_line}"
    prior_lnum = GetPureBasicPriorStatement(vlnum)
 
    # Quick return is if there is no prior non-blank. Returns 0.
 
    if prior_lnum < 1
       # ??
-      echom "<<<No prior nonblank line"
+# echom "<<<No prior nonblank line"
       return 0
    endif
 
@@ -311,7 +311,7 @@ def GetPureBasicIndent(vlnum: number): number
    prior_indent = indent(prior_lnum)
    prior_line = getline(prior_lnum)
    prior_words = split(prior_line)
-   echom $"prior ==> {prior_lnum}:{prior_line}"
+# echom $"prior ==> {prior_lnum}:{prior_line}"
 
    does_prior_outdent = IsPureBasicOutdenter(prior_words[0])
    does_prior_indent = IsPureBasicIndenter(prior_words[0])
@@ -320,12 +320,12 @@ def GetPureBasicIndent(vlnum: number): number
 
    if does_prior_indent && !does_prior_outdent
       if prior_words[0] ==? 'select' && (this_words[0] ==? 'case' || this_words[0] ==? 'default')
-         echom "---case or default after select"
+# echom "---case or default after select"
          if this_indent == prior_indent + shiftwidth()
-            echom "<<<Returning -1"
+# echom "<<<Returning -1"
             return -1
          endif
-         echom "<<<Returning prior + shiftwidth"
+# echom "<<<Returning prior + shiftwidth"
          return prior_indent + shiftwidth()
       endif
    endif
@@ -333,29 +333,29 @@ def GetPureBasicIndent(vlnum: number): number
    # Get the EndSelect lined up properly.
 
    if does_this_outdent && !does_this_indent && this_words[0] ==? 'select'
-      echom "---endselect"
+# echom "---endselect"
       if prior_words[0] ==? 'case' || prior_words[0] ==? 'default'
-         echom "---empty case or default prior to endselect"
+# echom "---empty case or default prior to endselect"
          if this_indent == prior_indent - shiftwidth()
-            echom "<<<Returning -1"
+# echom "<<<Returning -1"
             return -1
          endif
-         echom "<<<Returning prior - shiftwidth"
+# echom "<<<Returning prior - shiftwidth"
          return prior_indent - shiftwidth()
       elseif prior_words[0] ==? 'select'
-         echom "---empty select/endselect"
+# echom "---empty select/endselect"
          if this_indent == prior_indent
-            echom "<<<Returning -1"
+# echom "<<<Returning -1"
          endif
-         echom "<<<Returning prior"
+# echom "<<<Returning prior"
          return prior_indent
       else
-         echom "---non-empty case or default prior to endselect"
+# echom "---non-empty case or default prior to endselect"
          if this_indent == prior_indent - 2 * shiftwidth()
-            echom "<<<Returning -1"
+# echom "<<<Returning -1"
             return -1
          endif
-         echom "<<<Returing prior - 2 * shiftwidth"
+# echom "<<<Returing prior - 2 * shiftwidth"
          return prior_indent - 2 * shiftwidth()
       endif
    endif
@@ -378,24 +378,24 @@ def GetPureBasicIndent(vlnum: number): number
    # appropriately.
 
    if does_prior_indent
-      echom $"---2:Prior indents, indents: this={this_indent} prior={prior_indent}"
+# echom $"---2:Prior indents, indents: this={this_indent} prior={prior_indent}"
       if does_this_outdent
          # ??
-         echom "---2:This outdents, this likely should return prior"
+# echom "---2:This outdents, this likely should return prior"
          if this_indent == prior_indent
-            echom "<<<Returning -1"
+# echom "<<<Returning -1"
             return -1
          endif
-         echom "<<<Returning prior."
+# echom "<<<Returning prior."
          return prior_indent
       endif
       # ??
-      echom "---3:This indents or does nothing, should indent prior + shiftwidth"
+# echom "---3:This indents or does nothing, should indent prior + shiftwidth"
       if this_indent == prior_indent + shiftwidth()
-         echom "<<<Returning -1"
+# echom "<<<Returning -1"
          return -1
       endif
-      echom "<<<Returning prior + shiftwidth"
+# echom "<<<Returning prior + shiftwidth"
       return prior_indent + shiftwidth()
    endif
 
@@ -403,13 +403,13 @@ def GetPureBasicIndent(vlnum: number): number
    # then we do need to adjust.
 
    if does_this_outdent
-      echom $"---4:Prior outdents, indents: this={this_indent} prior={prior_indent}"
+# echom $"---4:Prior outdents, indents: this={this_indent} prior={prior_indent}"
       # ??
       if this_indent == prior_indent - shiftwidth()
-         echom "<<<Returning -1"
+# echom "<<<Returning -1"
          return -1
       endif
-      echom "<<<Returning prior - shiftwidth"
+# echom "<<<Returning prior - shiftwidth"
       return prior_indent - shiftwidth()
    endif
 
@@ -417,12 +417,12 @@ def GetPureBasicIndent(vlnum: number): number
    # has no impact on its own indent.
 
    # ??
-   echom $"---5:Neither dents, indents: this={this_indent} prior={prior_indent}"
+# echom $"---5:Neither dents, indents: this={this_indent} prior={prior_indent}"
    if this_indent == prior_indent
-      echom "<<<Returning -1"
+# echom "<<<Returning -1"
       return -1
    endif
-   echom "<<<Returning prior"
+# echom "<<<Returning prior"
    return prior_indent
 
 enddef
