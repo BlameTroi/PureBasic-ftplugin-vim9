@@ -57,10 +57,14 @@ setlocal nocindent
 # The words `else`, `elseif`, `case`, and `default` are in both lists.
 
 const PureBasicIndenters: list<string> = [
+         \ 'case',
          \ 'compilerendif',
          \ 'compilerif',
          \ 'datasection',
          \ 'declaremodule',
+         \ 'default',
+         \ 'else',
+         \ 'elseif',
          \ 'enumeration',
          \ 'enumerationbinary',
          \ 'for',
@@ -76,18 +80,19 @@ const PureBasicIndenters: list<string> = [
          \ 'procedurecdll',
          \ 'proceduredll',
          \ 'repeat',
+         \ 'select',
          \ 'structure',
          \ 'structureunion',
          \ 'while',
          \ 'with',
-         \ 'else',
-         \ 'elseif',
-         \ 'case',
-         \ 'default',
          \ ]->sort()
 
 const PureBasicOutdenters: list<string> = [
+         \ 'case',
          \ 'compilerendif',
+         \ 'default',
+         \ 'else',
+         \ 'elseif',
          \ 'enddatasection',
          \ 'enddeclaremodule',
          \ 'endenumeration',
@@ -97,6 +102,7 @@ const PureBasicOutdenters: list<string> = [
          \ 'endmacro',
          \ 'endmodule',
          \ 'endprocedure',
+         \ 'endselect',
          \ 'endstructure',
          \ 'endstructureunion',
          \ 'endwith',
@@ -104,17 +110,7 @@ const PureBasicOutdenters: list<string> = [
          \ 'next',
          \ 'until',
          \ 'wend',
-         \ 'else',
-         \ 'elseif',
-         \ 'case',
-         \ 'default',
          \ ]->sort()
-
-const PureBasicDualDenters: dict<string> = {
-   'elseif': '\v\celse(if)?',
-   'case': '\v\cdefault',
-   'default': '\v\ccase',
-}
 
 # Set Indentkeys:
 
@@ -145,15 +141,12 @@ for txt in PureBasicOutdenters
    execute $"setlocal indentkeys+=0=~{txt}"
 endfor
 
-# display to verify
-execute "setlocal indentkeys?"
-
 # Indenting in PureBasic is based on keywords. Words such as `if` indent the
 # following lines; words such as `endif` outdent their line and the following
 # lines; and words such as `elseif` indent the following lines after outdenting
 # their line.
 #
-# This is text driven, not semantic driven, which leads to two assumptions:
+# This is textual not semantic driven.
 # - Keywords are expected to be the first word on a line.
 # - There is only one statement per line.
 #
@@ -182,32 +175,21 @@ execute "setlocal indentkeys?"
 const True: bool = 1
 const False: bool = 0
 
-
 # Learn something about the first word on a line. Does it indent? Does it
 # outdent? Is it a word that does both and require even more special
 # handling?
-
-# If a word is one of the paired in-out denters in a larger block, return a
-# match string for the prior line's first word.
-
-def PureBasicDualPattern(txt: string): string
-   return PureBasicDualDenters->get(txt, "")
-enddef
-defcompile
 
 # Does this word indent?
 
 def IsPureBasicIndenter(txt: string): bool
    return PureBasicIndenters->index(tolower(txt)) != -1
 enddef
-defcompile
 
 # or outdent?
 
 def IsPureBasicOutdenter(txt: string): bool
    return PureBasicOutdenters->index(tolower(txt)) != -1
 enddef
-defcompile
 
 # Convert a bool to a string.
 
@@ -217,7 +199,6 @@ def BoolToStr(b: bool): string
    endif
    return "False"
 enddef
-defcompile
 
 # Is this a blank or comment line?
 
@@ -226,7 +207,7 @@ def IsPureBasicBlankOrComment(lnum: number): bool
    if len(line) == 0
       return True
    else
-      return line =~# '\v\s*REM'
+      return line =~# '\v^\s*\;'
    endif
 enddef
 defcompile
@@ -242,10 +223,10 @@ def GetPureBasicPriorStatement(lnum: number): number
 enddef
 defcompile
 
-# echom "IsPureBasicIndenter(if)" .. BoolToStr(IsPureBasicIndenter("if"))
-# echom "IsPureBasicIndenter(fred)" .. BoolToStr(IsPureBasicIndenter("fred"))
-# echom "IsPureBasicIndenter(add)" .. BoolToStr(IsPureBasicIndenter("add"))
-# echom "IsPureBasicIndenter(zebra)" .. BoolToStr(IsPureBasicIndenter("zebra"))
+  # echom "IsPureBasicIndenter(if)" .. BoolToStr(IsPureBasicIndenter("if"))
+  # echom "IsPureBasicIndenter(fred)" .. BoolToStr(IsPureBasicIndenter("fred"))
+  # echom "IsPureBasicIndenter(add)" .. BoolToStr(IsPureBasicIndenter("add"))
+  # echom "IsPureBasicIndenter(zebra)" .. BoolToStr(IsPureBasicIndenter("zebra"))
 
 # Determine the proper indent (in spaces) of this line. This is generally
 # based upon the prior line's indent and assumes that it has been indented
@@ -271,9 +252,6 @@ def GetPureBasicIndent(vlnum: number): number
 
 # echom $">>>GetIndent({vlnum})"
    if vlnum < 2
-      # FIXME: This doesn't work of I enter the first line with leading spaces,
-      # but it does when I do a manual indent.
-      # ??
 # echom "<<<First line"
       return 0
    endif
@@ -300,7 +278,7 @@ def GetPureBasicIndent(vlnum: number): number
    if len(this_words) < 1
       # Do not leave quickly, allowing this to run as a non-denter statement
       # helps with properly indenting after pressing enter.
-      # echom "---Empty line treated as a plain statement"
+# echom "---Empty line treated as a plain statement"
       does_this_outdent = False
       does_this_indent = False
    else
@@ -360,25 +338,11 @@ def GetPureBasicIndent(vlnum: number): number
       endif
    endif
 
-   # This block causes more problems than it solves.
-   # # If the prior line is an outdents always indent under it.
-   # # WRONG: or rather not this way,
-   # if does_prior_outdent
-   #    # ??
-   #    echom $"---1:Prior outdents, indents: this={this_indent} prior={prior_indent}"
-   #    if this_indent == prior_indent
-   #       echom "<<<Same indent, returning -1"
-   #       return -1
-   #    endif
-   #    echom "<<<Returing prior"
-   #    return prior_indent
-   # endif
-
-   # Next look to see if the prior indents, and if so handle it
-   # appropriately.
+   # Does the prior line indent this line? If so we are likely indenting.
 
    if does_prior_indent
 # echom $"---2:Prior indents, indents: this={this_indent} prior={prior_indent}"
+# But if this line outdents, we take the prior's indent.
       if does_this_outdent
          # ??
 # echom "---2:This outdents, this likely should return prior"
@@ -389,6 +353,7 @@ def GetPureBasicIndent(vlnum: number): number
 # echom "<<<Returning prior."
          return prior_indent
       endif
+      # Indent under the prior.
       # ??
 # echom "---3:This indents or does nothing, should indent prior + shiftwidth"
       if this_indent == prior_indent + shiftwidth()

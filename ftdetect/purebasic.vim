@@ -1,6 +1,5 @@
 vim9script
 # ftdetect/purebasic.vim
-# vim: ts=3 sw=3 sts=3 et ai fdm=marker
 # vim: ts=3 sw=3 sts=3 et ai fdm=manual
 # -----------------------------------------------------------------------------
 # Vim9 filetype plugin for the PureBasic language
