@@ -16,6 +16,9 @@ vim9script
 #
 # PureBasic is very regular so hopefully this will be a smooth operation.
 #------------------------------------------------------------------------------
+# Maintenance log:
+# 17 Jun 2025  use v:true & v:false.
+# 17 Jun 2025  handle type decorated procedure names, "Procedure.b", etc.
 
 if exists("b:did_indent")
    finish
@@ -172,9 +175,6 @@ endfor
 
 # Language keywords that influence indenting. Some keywords are in both lists.
 
-const True: bool = 1
-const False: bool = 0
-
 # Learn something about the first word on a line. Does it indent? Does it
 # outdent? Is it a word that does both and require even more special
 # handling?
@@ -205,7 +205,7 @@ enddef
 def IsPureBasicBlankOrComment(lnum: number): bool
    var line = getline(lnum)
    if len(line) == 0
-      return True
+      return v:true
    else
       return line =~# '\v^\s*\;'
    endif
@@ -237,12 +237,14 @@ def GetPureBasicIndent(vlnum: number): number
    # Define the variables early.
    var this_line: string
    var this_words: list<string>
+   var this_first: string
    var this_indent: number
    var does_this_indent: bool
    var does_this_outdent: bool
    var prior_lnum: number
    var prior_line: string
    var prior_words: list<string>
+   var prior_first: string
    var prior_indent: number
    var does_prior_indent: bool
    var does_prior_outdent: bool
@@ -260,6 +262,12 @@ def GetPureBasicIndent(vlnum: number): number
 
    this_line = getline(vlnum)
    this_words = split(this_line)
+   if len(this_words) > 0
+      this_first = split(this_words[0], "\\.")[0]
+   else
+      this_first = ""
+   endif
+
 # echom $"this  ==> {vlnum}:{this_line}"
    prior_lnum = GetPureBasicPriorStatement(vlnum)
 
@@ -279,25 +287,30 @@ def GetPureBasicIndent(vlnum: number): number
       # Do not leave quickly, allowing this to run as a non-denter statement
       # helps with properly indenting after pressing enter.
 # echom "---Empty line treated as a plain statement"
-      does_this_outdent = False
-      does_this_indent = False
+      does_this_outdent = v:false
+      does_this_indent = v:false
    else
-      does_this_outdent = IsPureBasicOutdenter(this_words[0])
-      does_this_indent = IsPureBasicIndenter(this_words[0])
+      does_this_outdent = IsPureBasicOutdenter(this_first)
+      does_this_indent = IsPureBasicIndenter(this_first)
    endif
 
    prior_indent = indent(prior_lnum)
    prior_line = getline(prior_lnum)
    prior_words = split(prior_line)
+   if len(prior_words) > 0
+      prior_first = split(prior_words[0], "\\.")[0]
+   else
+      prior_first = ""
+   endif
 # echom $"prior ==> {prior_lnum}:{prior_line}"
 
-   does_prior_outdent = IsPureBasicOutdenter(prior_words[0])
-   does_prior_indent = IsPureBasicIndenter(prior_words[0])
+   does_prior_outdent = IsPureBasicOutdenter(prior_first)
+   does_prior_indent = IsPureBasicIndenter(prior_first)
 
    # Select/Case... align a bit weirdly.
 
    if does_prior_indent && !does_prior_outdent
-      if prior_words[0] ==? 'select' && (this_words[0] ==? 'case' || this_words[0] ==? 'default')
+      if prior_first ==? 'select' && (this_first ==? 'case' || this_first ==? 'default')
 # echom "---case or default after select"
          if this_indent == prior_indent + shiftwidth()
 # echom "<<<Returning -1"
@@ -310,9 +323,9 @@ def GetPureBasicIndent(vlnum: number): number
 
    # Get the EndSelect lined up properly.
 
-   if does_this_outdent && !does_this_indent && this_words[0] ==? 'select'
+   if does_this_outdent && !does_this_indent && this_first ==? 'select'
 # echom "---endselect"
-      if prior_words[0] ==? 'case' || prior_words[0] ==? 'default'
+      if prior_first ==? 'case' || prior_first ==? 'default'
 # echom "---empty case or default prior to endselect"
          if this_indent == prior_indent - shiftwidth()
 # echom "<<<Returning -1"
@@ -320,7 +333,7 @@ def GetPureBasicIndent(vlnum: number): number
          endif
 # echom "<<<Returning prior - shiftwidth"
          return prior_indent - shiftwidth()
-      elseif prior_words[0] ==? 'select'
+      elseif prior_first ==? 'select'
 # echom "---empty select/endselect"
          if this_indent == prior_indent
 # echom "<<<Returning -1"
