@@ -38,7 +38,7 @@ syntax keyword pbKeyword Data Restore Read
 syntax keyword pbKeyword Define Dim ReDimr Global
 syntax keyword pbKeyword Enumeration EnumerationBinary EndEnumeration
 syntax keyword pbKeyword Global NewList NewMap Protected
-syntax keyword pbKeyword Threaded Import
+syntax keyword pbKeyword Threaded Import ImportC
 syntax keyword pbKeyword VariableName FunctionName EndImport
 syntax keyword pbKeyword IncludeFile XIncludeFile IncludeBinary
 syntax keyword pbKeyword IncludePath Macro EndMacro

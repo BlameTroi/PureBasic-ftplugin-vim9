@@ -58,7 +58,16 @@ vim9script
 # EditorConfig/Vim-Sleuth/Guess-Indent users -- those plugins sometimes mess
 # each other up. I don't use any of them myself. If things look weird, make
 # sure they aren't involved.
+#------------------------------------------------------------------------------
+# Maintenance log:
+# 17 Jun 2025  Put in version 9 guard
 # -----------------------------------------------------------------------------
+
+if !has('vim9script') ||  v:version < 900
+    # Needs Vim version 9.0 and above
+    echoerr "You need at least Vim 9.0"
+    finish
+endif
 
 if exists("b:did_ftplugin")
    finish
@@ -68,7 +77,13 @@ b:did_ftplugin = 1
 b:undo_ftplugin = 'setlocal iskeyword< commentstring< comments< suffixesadd< formatoptions< ignorecase<'
 
 setlocal suffixesadd=.pb,pbi
-setlocal comments=:;
+
+# NOTE: No matter what I did, I could not get tpope/vim-commentary to properly
+# uncomment a comment line. With and without trailing space, with and without
+# "b:", it just kept inserting new comment characters. I find that
+# tomtom/tcomment_vim works correctly.
+
+setlocal comments=:;\ 
 setlocal commentstring=;\ %s\ 
 setlocal iskeyword=a-z,A-Z,_,48-57
 setlocal ignorecase

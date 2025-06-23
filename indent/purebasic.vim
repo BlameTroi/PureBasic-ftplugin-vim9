@@ -19,6 +19,10 @@ vim9script
 # Maintenance log:
 # 17 Jun 2025  use v:true & v:false.
 # 17 Jun 2025  handle type decorated procedure names, "Procedure.b", etc.
+#------------------------------------------------------------------------------
+# Todo: Handle trailing comma lines, don't indent lines that are part of the
+#       continued expression--preserve whatever is manually set there to allow
+#       for prettying up code..
 
 if exists("b:did_indent")
    finish
