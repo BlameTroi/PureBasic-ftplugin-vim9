@@ -48,7 +48,7 @@ syntax keyword pbKeyword Module EndModule
 syntax keyword pbKeyword UseModule UnUseModule
 syntax keyword pbKeyword End Swap Print PrintN With EndWith
 syntax keyword pbKeyword Interface EndInterface
-syntax keyword pbKeyword Str Chr
+syntax keyword pbKeyword Str Chr Asc
 syntax keyword pbKeyword End
 
 # Procedures
@@ -143,8 +143,8 @@ syntax match pbError "=="
 # with `#`. PureBasic library constants are usually prefixed with `#<library
 # id>_`.
 
-syntax match pbIdentifier "\v<[_,a-z]\k*${0,1}[^\k]"
-syntax match pbConstant "\v<\#[_,a-z]\k*${0,1}[^\k]"
+syntax match pbIdentifier "\v<[_a-z][_a-z0-9]*"
+syntax match pbConstant "\v<\#[_a-z]\k*"
 syntax match pbBoolean "\v<\#(true|false)>"
 
 # String Literals
