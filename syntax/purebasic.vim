@@ -35,7 +35,7 @@ syntax case ignore
 syntax keyword pbKeyword Gosub Return FakeReturn Goto
 syntax keyword pbKeyword DataSection EndDataSection
 syntax keyword pbKeyword Data Restore Read
-syntax keyword pbKeyword Define Dim ReDimr Global
+syntax keyword pbKeyword Declare Define Dim ReDimr Global
 syntax keyword pbKeyword Enumeration EnumerationBinary EndEnumeration
 syntax keyword pbKeyword Global NewList NewMap Protected
 syntax keyword pbKeyword Threaded Import ImportC
@@ -144,7 +144,7 @@ syntax match pbError "=="
 # id>_`.
 
 syntax match pbIdentifier "\v<[_a-z][_a-z0-9]*"
-syntax match pbConstant "\v<\#[_a-z]\k*"
+syntax match pbConstant "\v<\#[_a-z][_a-z0-9]*"
 syntax match pbBoolean "\v<\#(true|false)>"
 
 # String Literals
