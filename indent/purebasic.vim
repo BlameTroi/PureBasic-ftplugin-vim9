@@ -302,6 +302,7 @@ def GetPureBasicIndent(vlnum: number): number
    prior_line = getline(prior_lnum)
    prior_words = split(prior_line)
    if len(prior_words) > 0
+      # split should handle : and \ in addition to .
       prior_first = split(prior_words[0], "\\.")[0]
    else
       prior_first = ""
@@ -327,7 +328,7 @@ def GetPureBasicIndent(vlnum: number): number
 
    # Get the EndSelect lined up properly.
 
-   if does_this_outdent && !does_this_indent && this_first ==? 'select'
+   if does_this_outdent && !does_this_indent && this_first ==? 'endselect'
 # echom "---endselect"
       if prior_first ==? 'case' || prior_first ==? 'default'
 # echom "---empty case or default prior to endselect"
