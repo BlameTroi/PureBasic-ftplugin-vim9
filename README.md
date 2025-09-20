@@ -1,3 +1,7 @@
+ARCHIVED September 2025.
+
+This is usable at this point but I've switched to the plugin free Helix editor. The real solution to the problems this plugin tries to solve is at minimum a TreeSitter grammar for PureBasic and with luck an LSP.
+
 # PureBasic Filetype Plugin for Vim
 
 This is an early (and as yet incomplete) filetype plugin for the [PureBasic](https://www.purebasic.com/) programming language.
@@ -52,15 +56,14 @@ To the extent that an additional copyright or license is needed:
 
 This software code is copyright 2025 by Troy Brumley <blametroi@gmail.com>
 
-Released to the public domain without restrictions, warranty, or guarantee.
-Use this at your own risk.
+Released to the public domain without restrictions, warranty, or guarantee. Use this at your own risk.
 
 ## In Conclusion
 
 The PureBasic community on Vim probably isn't very large, I imagine people not using the PureBasic IDE use Sublime, VS Code, or some other `Windows` friendly environment. I'm writing it for my own education as much as any other reason.
 
-[BlameTroi](BlameTroi@Gmail.com)  
+[BlameTroi](BlameTroi@Gmail.com)\
 is Troy Brumley
 
-So let it be written...  
+So let it be written...\
 ...so let it be done.
